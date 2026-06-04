@@ -1,6 +1,6 @@
 .PHONY: install run debug clean lint lint-strict
 
-PYTHON = python
+PYTHON = python3
 CONFIG = config.txt
 MAIN_SCRIPT = a_maze_ing.py
 

@@ -1,5 +1,6 @@
 import sys
 from config import parse, validate
+from maze import MazeGenerator
 
 
 def main() -> None:
@@ -12,7 +13,6 @@ def main() -> None:
     try:
         n_config = parse(sys.argv[1])
         config = validate(n_config)
-        print(config)
     except FileNotFoundError:
         print(f"Error: File '{sys.argv[1]}' not found.")
         sys.exit(1)
@@ -22,6 +22,17 @@ def main() -> None:
     except Exception as e:
         print(f"Unexpected error: {e}")
         sys.exit(1)
+
+    generator = MazeGenerator(
+        width=config["width"],
+        height=config["height"],
+        seed=config["seed"],
+        start=config["entry"],
+    )
+
+    maze = generator.main_generator()
+
+    print(maze)
 
 
 if __name__ == "__main__":
