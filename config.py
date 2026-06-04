@@ -110,7 +110,6 @@ def validate(config: dict[str, str]) -> dict[str, object]:
             raise ValueError("SEED must be a number")
     else:
         seed = random.randint(0, 999999)
-        print(f"No seed provided, using: {seed}")
 
     return {
         "width": width,

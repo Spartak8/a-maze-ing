@@ -28,11 +28,10 @@ def main() -> None:
         height=config["height"],
         seed=config["seed"],
         start=config["entry"],
+        perfect=config["perfect"]
     )
-
     maze = generator.main_generator()
-
-    print(maze)
+    generator.save_file(config["output_file"], config["exit"])
 
 
 if __name__ == "__main__":
