@@ -45,16 +45,6 @@ def validate(config: dict[str, str]) -> dict[str, object]:
         if key not in config:
             print(f"Error: missing key '{key}'")
             sys.exit(1)
-    if "SEED" in config:
-        try:
-            seed = int(config["SEED"])
-        except ValueError:
-            print("Error: SEED must be a number")
-            sys.exit(1)
-    else:
-        seed = random.randint(0, 999999)
-        print(f"No seed provided, using: {seed}")
-
     if not config["OUTPUT_FILE"]:
         print("Error: OUTPUT_FILE cannot be empty")
         sys.exit(1)
@@ -127,6 +117,16 @@ def validate(config: dict[str, str]) -> dict[str, object]:
     if result_en[0] == result_ex[0] and result_en[1] == result_ex[1]:
         print("Error: Exit and Entry are the same")
         sys.exit(1)
+
+    if "SEED" in config:
+        try:
+            seed = int(config["SEED"])
+        except ValueError:
+            print("Error: SEED must be a number")
+            sys.exit(1)
+    else:
+        seed = random.randint(0, 999999)
+        print(f"No seed provided, using: {seed}")
 
     return {
         "width": width,
