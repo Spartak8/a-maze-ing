@@ -67,51 +67,51 @@ class MazeGenerator:
                     raise ValueError("Maze is not fully connected")
 
     def make_imperfect(self) -> None:
-        for _ in range(self.width * self.height):
-            x = self.mij.randrange(self.width)
-            y = self.mij.randrange(self.height)
+            # Ломаем стены примерно в 5% случаев, чтобы появились циклы, 
+            # но лабиринт не превратился в пустое поле.
+            for _ in range((self.width * self.height) // 20):
+                x = self.mij.randrange(self.width)
+                y = self.mij.randrange(self.height)
 
-            if (x, y) in self.blocked_cells:
-                continue
+                if (x, y) in self.blocked_cells:
+                    continue
 
-            possible = []
+                possible = []
 
-            if y > 0 and (x, y - 1) not in self.blocked_cells and self.maze[y][x] & 1:
-                possible.append(0)
-            if (
-                x < self.width - 1
-                and (x + 1, y) not in self.blocked_cells
-                and self.maze[y][x] & (1 << 1)
-            ):
-                possible.append(1)
-            if (
-                y < self.height - 1
-                and (x, y + 1) not in self.blocked_cells
-                and self.maze[y][x] & (1 << 2)
-            ):
-                possible.append(2)
-            if x > 0 and (x - 1, y) not in self.blocked_cells and self.maze[y][x] & (1 << 3):
-                possible.append(3)
+                if y > 0 and (x, y - 1) not in self.blocked_cells and self.maze[y][x] & 1:
+                    possible.append(0)
+                if (
+                    x < self.width - 1
+                    and (x + 1, y) not in self.blocked_cells
+                    and self.maze[y][x] & (1 << 1)
+                ):
+                    possible.append(1)
+                if (
+                    y < self.height - 1
+                    and (x, y + 1) not in self.blocked_cells
+                    and self.maze[y][x] & (1 << 2)
+                ):
+                    possible.append(2)
+                if x > 0 and (x - 1, y) not in self.blocked_cells and self.maze[y][x] & (1 << 3):
+                    possible.append(3)
 
-            if not possible:
-                continue
+                if not possible:
+                    continue
 
-            direction = self.mij.choice(possible)
+                direction = self.mij.choice(possible)
 
-            if direction == 0:
-                self.maze[y][x] &= ~1
-                self.maze[y - 1][x] &= ~(1 << 2)
-            elif direction == 1:
-                self.maze[y][x] &= ~(1 << 1)
-                self.maze[y][x + 1] &= ~(1 << 3)
-            elif direction == 2:
-                self.maze[y][x] &= ~(1 << 2)
-                self.maze[y + 1][x] &= ~(1 << 0)
-            elif direction == 3:
-                self.maze[y][x] &= ~(1 << 3)
-                self.maze[y][x - 1] &= ~(1 << 1)
-
-            break
+                if direction == 0:
+                    self.maze[y][x] &= ~1
+                    self.maze[y - 1][x] &= ~(1 << 2)
+                elif direction == 1:
+                    self.maze[y][x] &= ~(1 << 1)
+                    self.maze[y][x + 1] &= ~(1 << 3)
+                elif direction == 2:
+                    self.maze[y][x] &= ~(1 << 2)
+                    self.maze[y + 1][x] &= ~(1 << 0)
+                elif direction == 3:
+                    self.maze[y][x] &= ~(1 << 3)
+                    self.maze[y][x - 1] &= ~(1 << 1)
 
     def main_generator(self) -> list[list[int]]:
         if not (0 <= self.start[0] < self.width and 0 <= self.start[1] < self.height):
@@ -186,3 +186,35 @@ class MazeGenerator:
             f.write("\n")
             f.write(f"{self.start[0]},{self.start[1]}\n")
             f.write(f"{end[0]},{end[1]}\n")
+
+    def display(self) -> None:
+            """Минимальная визуализация лабиринта в терминале."""
+            print("\n=== A-Maze-ing ===")
+            for y in range(self.height):
+                top_line = ""
+                mid_line = ""
+                for x in range(self.width):
+                    cell = self.maze[y][x]
+                    
+                    # Рисуем Северную стену (бит 1)
+                    top_line += "+---" if cell & 1 else "+   "
+                    
+                    # Рисуем Западную стену (бит 8)
+                    west_wall = "|" if cell & 8 else " "
+                    
+                    # Раскрашиваем узор "42" в зеленый цвет, если клетка заблокирована
+                    if (x, y) in self.blocked_cells:
+                        mid_line += f"{west_wall}\033[42m   \033[0m"
+                    else:
+                        mid_line += f"{west_wall}   "
+                        
+                # Замыкаем правый край (Восточная стена последней клетки в ряду)
+                print(top_line + "+")
+                print(mid_line + ("|" if self.maze[y][-1] & 2 else " "))
+                
+            # Рисуем самую нижнюю границу (Южная стена последнего ряда)
+            bottom_line = ""
+            for x in range(self.width):
+                bottom_line += "+---" if self.maze[-1][x] & 4 else "+   "
+            print(bottom_line + "+")
+            print("==================\n")
