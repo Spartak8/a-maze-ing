@@ -34,8 +34,7 @@ def main() -> None:
 
     generator.main_generator()
     road = generator.solve_maze(generator.maze, config["entry"], config["exit"])
-    show_menu(generator, config)
-    generator.save_file(config["output_file"], config["exit"], road)
+    show_menu(generator, config, road)
 
 
 if __name__ == "__main__":

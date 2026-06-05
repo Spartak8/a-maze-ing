@@ -71,49 +71,53 @@ class MazeGenerator:
                     raise ValueError("Maze is not fully connected")
 
     def make_imperfect(self) -> None:
-            for _ in range((self.width * self.height) // 20):
-                x = self.mij.randrange(self.width)
-                y = self.mij.randrange(self.height)
+        for _ in range((self.width * self.height) // 20):
+            x = self.mij.randrange(self.width)
+            y = self.mij.randrange(self.height)
 
-                if (x, y) in self.blocked_cells:
-                    continue
+            if (x, y) in self.blocked_cells:
+                continue
 
-                possible = []
+            possible = []
 
-                if y > 0 and (x, y - 1) not in self.blocked_cells and self.maze[y][x] & 1:
-                    possible.append(0)
-                if (
-                    x < self.width - 1
-                    and (x + 1, y) not in self.blocked_cells
-                    and self.maze[y][x] & (1 << 1)
-                ):
-                    possible.append(1)
-                if (
-                    y < self.height - 1
-                    and (x, y + 1) not in self.blocked_cells
-                    and self.maze[y][x] & (1 << 2)
-                ):
-                    possible.append(2)
-                if x > 0 and (x - 1, y) not in self.blocked_cells and self.maze[y][x] & (1 << 3):
-                    possible.append(3)
+            if y > 0 and (x, y - 1) not in self.blocked_cells and self.maze[y][x] & 1:
+                possible.append(0)
+            if (
+                x < self.width - 1
+                and (x + 1, y) not in self.blocked_cells
+                and self.maze[y][x] & (1 << 1)
+            ):
+                possible.append(1)
+            if (
+                y < self.height - 1
+                and (x, y + 1) not in self.blocked_cells
+                and self.maze[y][x] & (1 << 2)
+            ):
+                possible.append(2)
+            if (
+                x > 0
+                and (x - 1, y) not in self.blocked_cells
+                and self.maze[y][x] & (1 << 3)
+            ):
+                possible.append(3)
 
-                if not possible:
-                    continue
+            if not possible:
+                continue
 
-                direction = self.mij.choice(possible)
+            direction = self.mij.choice(possible)
 
-                if direction == 0:
-                    self.maze[y][x] &= ~1
-                    self.maze[y - 1][x] &= ~(1 << 2)
-                elif direction == 1:
-                    self.maze[y][x] &= ~(1 << 1)
-                    self.maze[y][x + 1] &= ~(1 << 3)
-                elif direction == 2:
-                    self.maze[y][x] &= ~(1 << 2)
-                    self.maze[y + 1][x] &= ~(1 << 0)
-                elif direction == 3:
-                    self.maze[y][x] &= ~(1 << 3)
-                    self.maze[y][x - 1] &= ~(1 << 1)
+            if direction == 0:
+                self.maze[y][x] &= ~1
+                self.maze[y - 1][x] &= ~(1 << 2)
+            elif direction == 1:
+                self.maze[y][x] &= ~(1 << 1)
+                self.maze[y][x + 1] &= ~(1 << 3)
+            elif direction == 2:
+                self.maze[y][x] &= ~(1 << 2)
+                self.maze[y + 1][x] &= ~(1 << 0)
+            elif direction == 3:
+                self.maze[y][x] &= ~(1 << 3)
+                self.maze[y][x - 1] &= ~(1 << 1)
 
     def main_generator(self) -> list[list[int]]:
         if not (0 <= self.start[0] < self.width and 0 <= self.start[1] < self.height):
@@ -243,7 +247,7 @@ class MazeGenerator:
         return "".join(path)
 
     def save_file(self, filename: str, end: tuple[int, int], road: str) -> None:
-        with open(filename, 'w') as f:
+        with open(filename, "w") as f:
             for row in self.maze:
                 hex_row = "".join(f"{cell:X}" for cell in row)
                 f.write(hex_row + "\n")
@@ -252,7 +256,12 @@ class MazeGenerator:
             f.write(f"{end[0]},{end[1]}\n")
             f.write(f"{road}\n")
 
-    def display(self, wall_color: str = "", path_coords: set = None, end_pos: tuple[int, int] = None) -> None:
+    def display(
+        self,
+        wall_color: str = "",
+        path_coords: set = None,
+        end_pos: tuple[int, int] = None,
+    ) -> None:
         """Классическая визуализация +---+, которая идеально работает в PowerShell."""
         if path_coords is None:
             path_coords = set()
@@ -287,3 +296,31 @@ class MazeGenerator:
             bottom_line += "+---" if self.maze[-1][x] & 4 else "+   "
         print(f"{wall_color}{bottom_line}+{reset}")
         print("==================\n")
+
+        def display_solution(
+            self,
+            solution: str,
+            start: tuple[int, int],
+            end: tuple[int, int],
+            wall_color: str = "",
+        ) -> None:
+            x, y = start
+            path_coords = {(x, y)}
+
+            for move in solution:
+                if move == "N":
+                    y -= 1
+                elif move == "E":
+                    x += 1
+                elif move == "S":
+                    y += 1
+                elif move == "W":
+                    x -= 1
+
+                path_coords.add((x, y))
+
+            self.display(
+                wall_color=wall_color,
+                path_coords=path_coords,
+                end_pos=end,
+            )
