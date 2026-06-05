@@ -191,34 +191,38 @@ class MazeGenerator:
             f.write(f"{self.start[0]},{self.start[1]}\n")
             f.write(f"{end[0]},{end[1]}\n")
 
-    def display(self) -> None:
-            """Минимальная визуализация лабиринта в терминале."""
-            print("\n=== A-Maze-ing ===")
-            for y in range(self.height):
-                top_line = ""
-                mid_line = ""
-                for x in range(self.width):
-                    cell = self.maze[y][x]
-                    
-                    # Рисуем Северную стену (бит 1)
-                    top_line += "+---" if cell & 1 else "+   "
-                    
-                    # Рисуем Западную стену (бит 8)
-                    west_wall = "|" if cell & 8 else " "
-                    
-                    # Раскрашиваем узор "42" в зеленый цвет, если клетка заблокирована
-                    if (x, y) in self.blocked_cells:
-                        mid_line += f"{west_wall}\033[42m   \033[0m"
-                    else:
-                        mid_line += f"{west_wall}   "
-                        
-                # Замыкаем правый край (Восточная стена последней клетки в ряду)
-                print(top_line + "+")
-                print(mid_line + ("|" if self.maze[y][-1] & 2 else " "))
-                
-            # Рисуем самую нижнюю границу (Южная стена последнего ряда)
-            bottom_line = ""
+    def display(self, wall_color: str = "", path_coords: set = None, end_pos: tuple[int, int] = None) -> None:
+        """Классическая визуализация +---+, которая идеально работает в PowerShell."""
+        if path_coords is None:
+            path_coords = set()
+        if end_pos is None:
+            end_pos = (self.width - 1, self.height - 1)
+
+        print("\n=== A-Maze-ing ===")
+        reset = "\033[0m"
+
+        if not wall_color:
+            wall_color = reset
+
+        for y in range(self.height):
+            top_line = ""
+            mid_line = ""
             for x in range(self.width):
-                bottom_line += "+---" if self.maze[-1][x] & 4 else "+   "
-            print(bottom_line + "+")
-            print("==================\n")
+                cell = self.maze[y][x]
+
+                top_line += "+---" if cell & 1 else "+   "
+                west_wall = "|" if cell & 8 else " "
+                if (x, y) in self.blocked_cells:
+                    mid_line += f"{west_wall}\033[42m   {reset}{wall_color}"
+                elif (x, y) in path_coords:
+                    mid_line += f"{west_wall}\033[44m   {reset}{wall_color}"
+                else:
+                    mid_line += f"{west_wall}   "
+            print(f"{wall_color}{top_line}+{reset}")
+            east_wall = "|" if self.maze[y][-1] & 2 else " "
+            print(f"{wall_color}{mid_line}{east_wall}{reset}")
+        bottom_line = ""
+        for x in range(self.width):
+            bottom_line += "+---" if self.maze[-1][x] & 4 else "+   "
+        print(f"{wall_color}{bottom_line}+{reset}")
+        print("==================\n")
