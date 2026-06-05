@@ -6,7 +6,8 @@ from maze import MazeGenerator
 def main() -> None:
     """Main function to run the maze generator."""
     if len(sys.argv) != 2:
-        print("Error: Invalid arguments. Usage: python3 a_maze_ing.py config.txt")
+        print("Error: Invalid arguments. Usage: python3 a_maze_ing.py"
+              "config.txt")
         sys.exit(1)
 
     try:
@@ -22,7 +23,6 @@ def main() -> None:
         print(f"Unexpected error: {e}")
         sys.exit(1)
 
-    # Инициализируем генератор
     generator = MazeGenerator(
         width=config["width"],
         height=config["height"],
@@ -30,14 +30,11 @@ def main() -> None:
         start=config["entry"],
         perfect=config["perfect"]
     )
-    
-    # 1. Генерируем лабиринт
-    maze = generator.main_generator()
-    
-    # 2. Показываем в терминале, чтобы проверить работу алгоритма
-    generator.display() 
-    
-    # 3. Сохраняем в файл
+
+    generator.main_generator()
+
+    generator.display()
+
     generator.save_file(config["output_file"], config["exit"])
 
 
