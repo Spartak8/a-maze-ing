@@ -71,8 +71,6 @@ class MazeGenerator:
                     raise ValueError("Maze is not fully connected")
 
     def make_imperfect(self) -> None:
-            # Ломаем стены примерно в 5% случаев, чтобы появились циклы, 
-            # но лабиринт не превратился в пустое поле.
             for _ in range((self.width * self.height) // 20):
                 x = self.mij.randrange(self.width)
                 y = self.mij.randrange(self.height)
@@ -182,7 +180,69 @@ class MazeGenerator:
 
         return self.maze
 
-    def save_file(self, filename: str, end: tuple[int, int]):
+    def solve_maze(
+        self,
+        maze: list[list[int]],
+        start: tuple[int, int],
+        end: tuple[int, int],
+    ) -> str:
+        height = len(maze)
+        width = len(maze[0])
+
+        queue = [start]
+        head = 0
+        visited = {start}
+        parent: dict[tuple[int, int], tuple[tuple[int, int], str]] = {}
+
+        while head < len(queue):
+            x, y = queue[head]
+            head += 1
+
+            if (x, y) == end:
+                break
+
+            if y > 0 and not (maze[y][x] & 1):
+                next_cell = (x, y - 1)
+                if next_cell not in visited:
+                    visited.add(next_cell)
+                    parent[next_cell] = ((x, y), "N")
+                    queue.append(next_cell)
+
+            if x < width - 1 and not (maze[y][x] & (1 << 1)):
+                next_cell = (x + 1, y)
+                if next_cell not in visited:
+                    visited.add(next_cell)
+                    parent[next_cell] = ((x, y), "E")
+                    queue.append(next_cell)
+
+            if y < height - 1 and not (maze[y][x] & (1 << 2)):
+                next_cell = (x, y + 1)
+                if next_cell not in visited:
+                    visited.add(next_cell)
+                    parent[next_cell] = ((x, y), "S")
+                    queue.append(next_cell)
+
+            if x > 0 and not (maze[y][x] & (1 << 3)):
+                next_cell = (x - 1, y)
+                if next_cell not in visited:
+                    visited.add(next_cell)
+                    parent[next_cell] = ((x, y), "W")
+                    queue.append(next_cell)
+
+        if end not in visited:
+            raise ValueError("No path from entry to exit")
+
+        path = []
+        current = end
+
+        while current != start:
+            previous, move = parent[current]
+            path.append(move)
+            current = previous
+        path.reverse()
+        return "".join(path)
+
+    def save_file(self, filename: str, end: tuple[int, int], road: str) -> None:
         with open(filename, 'w') as f:
             for row in self.maze:
                 hex_row = "".join(f"{cell:X}" for cell in row)
@@ -190,6 +250,7 @@ class MazeGenerator:
             f.write("\n")
             f.write(f"{self.start[0]},{self.start[1]}\n")
             f.write(f"{end[0]},{end[1]}\n")
+            f.write(f"{road}\n")
 
     def display(self, wall_color: str = "", path_coords: set = None, end_pos: tuple[int, int] = None) -> None:
         """Классическая визуализация +---+, которая идеально работает в PowerShell."""
