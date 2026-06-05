@@ -297,30 +297,3 @@ class MazeGenerator:
         print(f"{wall_color}{bottom_line}+{reset}")
         print("==================\n")
 
-        def display_solution(
-            self,
-            solution: str,
-            start: tuple[int, int],
-            end: tuple[int, int],
-            wall_color: str = "",
-        ) -> None:
-            x, y = start
-            path_coords = {(x, y)}
-
-            for move in solution:
-                if move == "N":
-                    y -= 1
-                elif move == "E":
-                    x += 1
-                elif move == "S":
-                    y += 1
-                elif move == "W":
-                    x -= 1
-
-                path_coords.add((x, y))
-
-            self.display(
-                wall_color=wall_color,
-                path_coords=path_coords,
-                end_pos=end,
-            )
