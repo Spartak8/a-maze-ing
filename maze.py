@@ -14,7 +14,11 @@ class MazeGenerator:
         self.height = height
         self.start = start
         self.perfect = perfect
-        self.mij = random.Random(seed)
+        self.reset(seed)
+
+    def reset(self, new_seed: int) -> None:
+        self.seed = new_seed
+        self.mij = random.Random(new_seed)
         self.maze = [[15 for _ in range(self.width)] for _ in range(self.height)]
         self.visited = [[False for _ in range(self.width)] for _ in range(self.height)]
         self.blocked_cells: set[tuple[int, int]] = set()

@@ -1,6 +1,7 @@
 import sys
 from config import parse, validate
 from maze import MazeGenerator
+from show import show_menu
 
 
 def main() -> None:
@@ -32,9 +33,7 @@ def main() -> None:
     )
 
     generator.main_generator()
-
-    generator.display()
-
+    show_menu(generator, config)
     generator.save_file(config["output_file"], config["exit"])
 
 
