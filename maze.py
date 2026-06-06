@@ -1,4 +1,5 @@
 import random
+import sys
 
 
 class MazeGenerator:
@@ -19,12 +20,8 @@ class MazeGenerator:
     def reset(self, new_seed: int) -> None:
         self.seed = new_seed
         self.mij = random.Random(new_seed)
-        self.maze = [
-            [15 for _ in range(self.width)] for _ in range(self.height)
-        ]
-        self.visited = [
-            [False for _ in range(self.width)] for _ in range(self.height)
-        ]
+        self.maze = [[15 for _ in range(self.width)] for _ in range(self.height)]
+        self.visited = [[False for _ in range(self.width)] for _ in range(self.height)]
         self.blocked_cells: set[tuple[int, int]] = set()
 
     def add_42_pattern(self) -> None:
@@ -84,10 +81,7 @@ class MazeGenerator:
 
             possible = []
 
-            if (
-                y > 0 and (x, y - 1) not in self.blocked_cells
-                and self.maze[y][x] & 1
-            ):
+            if y > 0 and (x, y - 1) not in self.blocked_cells and self.maze[y][x] & 1:
                 possible.append(0)
             if (
                 x < self.width - 1
@@ -127,10 +121,7 @@ class MazeGenerator:
                 self.maze[y][x - 1] &= ~(1 << 1)
 
     def main_generator(self) -> list[list[int]]:
-        if not (
-            0 <= self.start[0] < self.width
-            and 0 <= self.start[1] < self.height
-        ):
+        if not (0 <= self.start[0] < self.width and 0 <= self.start[1] < self.height):
             raise ValueError("Start position is outside the maze")
 
         self.add_42_pattern()
@@ -207,6 +198,10 @@ class MazeGenerator:
         head = 0
         visited = {start}
         parent: dict[tuple[int, int], tuple[tuple[int, int], str]] = {}
+        for i in self.blocked_cells:
+            if i == end or i == start:
+                print("Error: entry or exit is blocked by 42 pattern")
+                sys.exit()
 
         while head < len(queue):
             x, y = queue[head]
@@ -256,9 +251,7 @@ class MazeGenerator:
         path.reverse()
         return "".join(path)
 
-    def save_file(
-        self, filename: str, end: tuple[int, int], road: str
-    ) -> None:
+    def save_file(self, filename: str, end: tuple[int, int], road: str) -> None:
         with open(filename, "w") as f:
             for row in self.maze:
                 hex_row = "".join(f"{cell:X}" for cell in row)
@@ -289,27 +282,33 @@ class MazeGenerator:
         for y in range(self.height):
             top_line = ""
             mid_line = ""
+
             for x in range(self.width):
                 cell = self.maze[y][x]
 
                 top_line += "+---" if cell & 1 else "+   "
                 west_wall = "|" if cell & 8 else " "
-                if (x, y) in self.blocked_cells:
-                    mid_line += f"{west_wall}\033[42m   {reset}{wall_color}"
-                elif (x, y) in path_coords:
-                    mid_line += f"{west_wall}\033[44m   {reset}{wall_color}"
-                elif (x, y) == self.start:
-                    # магента = вход
+
+                if (x, y) == self.start:
                     mid_line += f"{west_wall}\033[45m   {reset}{wall_color}"
                 elif (x, y) == end_pos:
                     mid_line += f"{west_wall}\033[41m   {reset}{wall_color}"
+                elif (x, y) in self.blocked_cells:
+                    mid_line += f"{west_wall}\033[42m   {reset}{wall_color}"
+                elif (x, y) in path_coords:
+                    mid_line += f"{west_wall}\033[44m   {reset}{wall_color}"
                 else:
                     mid_line += f"{west_wall}   "
+
             print(f"{wall_color}{top_line}+{reset}")
+
             east_wall = "|" if self.maze[y][-1] & 2 else " "
             print(f"{wall_color}{mid_line}{east_wall}{reset}")
+
         bottom_line = ""
+
         for x in range(self.width):
             bottom_line += "+---" if self.maze[-1][x] & 4 else "+   "
+
         print(f"{wall_color}{bottom_line}+{reset}")
         print("==================\n")
