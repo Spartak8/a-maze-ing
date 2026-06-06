@@ -10,4 +10,3 @@ maze.txt
 dist/
 build/
 *.egg-info/
-*.whl
