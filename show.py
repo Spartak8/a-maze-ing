@@ -7,6 +7,7 @@ from config import ConfigDict
 def path_to_coords(
     solution: str, start: tuple[int, int]
 ) -> set[tuple[int, int]]:
+    """Convert a solution string into path coordinates."""
     x, y = start
     coords = {(x, y)}
 
@@ -25,7 +26,7 @@ def path_to_coords(
 
 
 def show_menu(maze: MazeGenerator, config: ConfigDict, road: str) -> None:
-    """Show interactive menu for maze control."""
+    """Show the interactive maze menu."""
     colors = ["\033[0m", "\033[31m", "\033[33m", "\033[34m", "\033[36m"]
     color_idx = 0
     show_path = False

@@ -3,6 +3,8 @@ import sys
 
 
 class MazeGenerator:
+    """Generate, solve, save, and display mazes."""
+
     def __init__(
         self,
         width: int,
@@ -11,6 +13,7 @@ class MazeGenerator:
         start: tuple[int, int],
         perfect: bool,
     ) -> None:
+        """Create a maze generator with fixed size and seed."""
         self.width = width
         self.height = height
         self.start = start
@@ -18,13 +21,19 @@ class MazeGenerator:
         self.reset(seed)
 
     def reset(self, new_seed: int) -> None:
+        """Reset maze data using a new seed."""
         self.seed = new_seed
         self.mij = random.Random(new_seed)
-        self.maze = [[15 for _ in range(self.width)] for _ in range(self.height)]
-        self.visited = [[False for _ in range(self.width)] for _ in range(self.height)]
+        self.maze = [
+            [15 for _ in range(self.width)] for _ in range(self.height)
+            ]
+        self.visited = [
+            [False for _ in range(self.width)] for _ in range(self.height)
+            ]
         self.blocked_cells: set[tuple[int, int]] = set()
 
     def add_42_pattern(self) -> None:
+        """Add the closed 42 pattern to the maze."""
         pattern = [
             "10010111",
             "10010001",
@@ -57,6 +66,7 @@ class MazeGenerator:
                     self.blocked_cells.add((x, y))
 
     def enforce_border_walls(self) -> None:
+        """Keep the outside border walls closed."""
         for x in range(self.width):
             self.maze[0][x] |= 1
             self.maze[self.height - 1][x] |= 4
@@ -66,12 +76,14 @@ class MazeGenerator:
             self.maze[y][self.width - 1] |= 2
 
     def check_connectivity(self) -> None:
+        """Check that every normal cell was reached."""
         for y in range(self.height):
             for x in range(self.width):
                 if (x, y) not in self.blocked_cells and not self.visited[y][x]:
                     raise ValueError("Maze is not fully connected")
 
     def make_imperfect(self) -> None:
+        """Open extra safe walls to create loops."""
         for _ in range((self.width * self.height) // 20):
             x = self.mij.randrange(self.width)
             y = self.mij.randrange(self.height)
@@ -81,7 +93,11 @@ class MazeGenerator:
 
             possible = []
 
-            if y > 0 and (x, y - 1) not in self.blocked_cells and self.maze[y][x] & 1:
+            if (
+                y > 0
+                and (x, y - 1) not in self.blocked_cells
+                and self.maze[y][x] & 1
+            ):
                 possible.append(0)
             if (
                 x < self.width - 1
@@ -121,7 +137,11 @@ class MazeGenerator:
                 self.maze[y][x - 1] &= ~(1 << 1)
 
     def main_generator(self) -> list[list[int]]:
-        if not (0 <= self.start[0] < self.width and 0 <= self.start[1] < self.height):
+        """Generate and return the maze matrix."""
+        if not (
+            0 <= self.start[0] < self.width
+            and 0 <= self.start[1] < self.height
+        ):
             raise ValueError("Start position is outside the maze")
 
         self.add_42_pattern()
@@ -132,6 +152,7 @@ class MazeGenerator:
         trace = [(self.x, self.y)]
 
         def check_possible(x: int, y: int) -> list[int]:
+            """Find unvisited neighbours for the current cell."""
             possible = []
             if y > 0 and not self.visited[y - 1][x]:
                 possible.append(0)
@@ -144,6 +165,7 @@ class MazeGenerator:
             return possible
 
         def moves(direction: int) -> None:
+            """Move in one direction and open matching walls."""
             nx, ny = self.x, self.y
 
             if direction == 0:
@@ -191,6 +213,7 @@ class MazeGenerator:
         start: tuple[int, int],
         end: tuple[int, int],
     ) -> str:
+        """Find the shortest path between two cells."""
         height = len(maze)
         width = len(maze[0])
 
@@ -251,7 +274,13 @@ class MazeGenerator:
         path.reverse()
         return "".join(path)
 
-    def save_file(self, filename: str, end: tuple[int, int], road: str) -> None:
+    def save_file(
+            self,
+            filename: str,
+            end: tuple[int, int],
+            road: str,
+            ) -> None:
+        """Save the maze and solution path to a file."""
         with open(filename, "w") as f:
             for row in self.maze:
                 hex_row = "".join(f"{cell:X}" for cell in row)
@@ -267,7 +296,7 @@ class MazeGenerator:
         path_coords: set[tuple[int, int]] | None = None,
         end_pos: tuple[int, int] | None = None,
     ) -> None:
-        """Классическая визуализация +---+, которая идеально работает в PS."""
+        """Display the maze in the terminal."""
         if path_coords is None:
             path_coords = set()
         if end_pos is None:

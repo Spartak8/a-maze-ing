@@ -5,7 +5,7 @@ from show import show_menu
 
 
 def main() -> None:
-    """Main function to run the maze generator."""
+    """Run the maze generator from a config file."""
     if len(sys.argv) != 2:
         print("Error: Invalid arguments. Usage: python3 a_maze_ing.py"
               "config.txt")

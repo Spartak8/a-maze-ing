@@ -1,7 +1,0 @@
-README.md
-maze.py
-pyproject.toml
-mazegen_amazeing.egg-info/PKG-INFO
-mazegen_amazeing.egg-info/SOURCES.txt
-mazegen_amazeing.egg-info/dependency_links.txt
-mazegen_amazeing.egg-info/top_level.txt

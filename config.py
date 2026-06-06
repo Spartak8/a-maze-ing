@@ -3,6 +3,8 @@ from typing import TypedDict
 
 
 class ConfigDict(TypedDict):
+    """Store validated maze configuration values."""
+
     width: int
     height: int
     entry: tuple[int, int]
@@ -13,18 +15,7 @@ class ConfigDict(TypedDict):
 
 
 def parse(filepath: str) -> dict[str, str]:
-    """Read config file and return dictionary of raw string values.
-
-    Args:
-        filepath: Path to the config file.
-
-    Returns:
-        Dictionary with raw string values.
-
-    Raises:
-        ValueError: If line is invalid.
-        FileNotFoundError: If file does not exist.
-    """
+    """Read raw key-value pairs from a config file."""
     config = {}
     with open(filepath) as f:
         for line in f:
@@ -41,17 +32,7 @@ def parse(filepath: str) -> dict[str, str]:
 
 
 def validate(config: dict[str, str]) -> ConfigDict:
-    """Validate and convert raw config dictionary.
-
-    Args:
-        config: Raw dictionary from parse().
-
-    Returns:
-        Dictionary with validated and converted values.
-
-    Raises:
-        ValueError: If config is invalid.
-    """
+    """Validate raw config values and convert them to Python types."""
     required = ["WIDTH", "HEIGHT", "ENTRY", "EXIT", "OUTPUT_FILE", "PERFECT"]
     for key in required:
         if key not in config:
