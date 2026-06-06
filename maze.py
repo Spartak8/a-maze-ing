@@ -286,6 +286,10 @@ class MazeGenerator:
                     mid_line += f"{west_wall}\033[42m   {reset}{wall_color}"
                 elif (x, y) in path_coords:
                     mid_line += f"{west_wall}\033[44m   {reset}{wall_color}"
+                elif (x, y) == self.start:
+                    mid_line += f"{west_wall}\033[45m   {reset}{wall_color}"  # магента = вход
+                elif (x, y) == end_pos:
+                    mid_line += f"{west_wall}\033[41m   {reset}{wall_color}"
                 else:
                     mid_line += f"{west_wall}   "
             print(f"{wall_color}{top_line}+{reset}")
