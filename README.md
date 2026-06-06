@@ -1,4 +1,4 @@
-*This project has been created as part of the 42 curriculum by skhachat, armelkon.*
+*This project has been created as part of the 42 curriculum by skhachat, dyedigar.*
 
 # A-Maze-ing
 
@@ -202,11 +202,11 @@ python -m build
 | Member | Responsibilities |
 |--------|-----------------|
 | **skhachat** | Config parser (`config.py`), input validation, interactive menu (`show.py`), visual display, testing, pip packaging, Makefile, `.gitignore`, README, output file format |
-| **armelkon** | Maze generator (`maze.py`), BFS solver, "42" pattern, border enforcement, connectivity check, imperfect maze logic, main entry point (`a_maze_ing.py`) |
+| **dyedigar** | Maze generator (`maze.py`), BFS solver, "42" pattern, border enforcement, connectivity check, imperfect maze logic, main entry point (`a_maze_ing.py`) |
 
 ### Planning and Evolution
 
-We started by splitting the project into two independent parts: the generator core (armelkon) and the interface/config layer (skhachat). This allowed parallel development without blocking each other.
+We started by splitting the project into two independent parts: the generator core (dyedigar) and the interface/config layer (skhachat). This allowed parallel development without blocking each other.
 
 Initially we planned to use the MiniLibX graphical library, but switched to terminal ASCII rendering early on — it was faster to implement, easier to debug, and worked across all platforms.
 

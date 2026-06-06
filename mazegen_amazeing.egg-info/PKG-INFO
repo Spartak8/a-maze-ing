@@ -1,0 +1,6 @@
+Metadata-Version: 2.4
+Name: mazegen-amazeing
+Version: 1.0.0
+Summary: A procedural maze generator and solver
+Author: skhachat, dyedigar
+Requires-Python: >=3.10
