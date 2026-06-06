@@ -14,8 +14,7 @@ debug:
 	$(PYTHON) -m pdb $(MAIN_SCRIPT) $(CONFIG)
 
 clean:
-	rm -rf __pycache__
-	rm -rf .mypy_cache
+	rm -rf __pycache__ .mypy_cache dist/ build/ mazegen_amazeing.egg-info/
 	rm -f maze.txt
 
 lint:
