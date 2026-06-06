@@ -1,4 +1,15 @@
 import random
+from typing import TypedDict
+
+
+class ConfigDict(TypedDict):
+    width: int
+    height: int
+    entry: tuple[int, int]
+    exit: tuple[int, int]
+    output_file: str
+    perfect: bool
+    seed: int
 
 
 def parse(filepath: str) -> dict[str, str]:
@@ -29,7 +40,7 @@ def parse(filepath: str) -> dict[str, str]:
         return config
 
 
-def validate(config: dict[str, str]) -> dict[str, object]:
+def validate(config: dict[str, str]) -> ConfigDict:
     """Validate and convert raw config dictionary.
 
     Args:
@@ -71,13 +82,13 @@ def validate(config: dict[str, str]) -> dict[str, object]:
 
     try:
         n_entry = [int(x) for x in entry]
-        result_en = tuple(n_entry)
+        result_en = (n_entry[0], n_entry[1])
     except ValueError:
         raise ValueError("Entry must be a number")
 
     try:
         n_ex = [int(x) for x in ex]
-        result_ex = tuple(n_ex)
+        result_ex = (n_ex[0], n_ex[1])
     except ValueError:
         raise ValueError("Exit must be a number")
 

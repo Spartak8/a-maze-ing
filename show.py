@@ -1,9 +1,12 @@
 import random
 
 from maze import MazeGenerator
+from config import ConfigDict
 
 
-def path_to_coords(solution: str, start: tuple[int, int]) -> set[tuple[int, int]]:
+def path_to_coords(
+    solution: str, start: tuple[int, int]
+) -> set[tuple[int, int]]:
     x, y = start
     coords = {(x, y)}
 
@@ -21,7 +24,7 @@ def path_to_coords(solution: str, start: tuple[int, int]) -> set[tuple[int, int]
     return coords
 
 
-def show_menu(maze: MazeGenerator, config: dict, road: str) -> None:
+def show_menu(maze: MazeGenerator, config: ConfigDict, road: str) -> None:
     """Show interactive menu for maze control."""
     colors = ["\033[0m", "\033[31m", "\033[33m", "\033[34m", "\033[36m"]
     color_idx = 0

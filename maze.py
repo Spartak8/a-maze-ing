@@ -19,8 +19,12 @@ class MazeGenerator:
     def reset(self, new_seed: int) -> None:
         self.seed = new_seed
         self.mij = random.Random(new_seed)
-        self.maze = [[15 for _ in range(self.width)] for _ in range(self.height)]
-        self.visited = [[False for _ in range(self.width)] for _ in range(self.height)]
+        self.maze = [
+            [15 for _ in range(self.width)] for _ in range(self.height)
+        ]
+        self.visited = [
+            [False for _ in range(self.width)] for _ in range(self.height)
+        ]
         self.blocked_cells: set[tuple[int, int]] = set()
 
     def add_42_pattern(self) -> None:
@@ -67,7 +71,7 @@ class MazeGenerator:
     def check_connectivity(self) -> None:
         for y in range(self.height):
             for x in range(self.width):
-                if (x, y) not in self.blocked_cells and self.visited[y][x] == False:
+                if (x, y) not in self.blocked_cells and not self.visited[y][x]:
                     raise ValueError("Maze is not fully connected")
 
     def make_imperfect(self) -> None:
@@ -80,7 +84,10 @@ class MazeGenerator:
 
             possible = []
 
-            if y > 0 and (x, y - 1) not in self.blocked_cells and self.maze[y][x] & 1:
+            if (
+                y > 0 and (x, y - 1) not in self.blocked_cells
+                and self.maze[y][x] & 1
+            ):
                 possible.append(0)
             if (
                 x < self.width - 1
@@ -120,7 +127,10 @@ class MazeGenerator:
                 self.maze[y][x - 1] &= ~(1 << 1)
 
     def main_generator(self) -> list[list[int]]:
-        if not (0 <= self.start[0] < self.width and 0 <= self.start[1] < self.height):
+        if not (
+            0 <= self.start[0] < self.width
+            and 0 <= self.start[1] < self.height
+        ):
             raise ValueError("Start position is outside the maze")
 
         self.add_42_pattern()
@@ -132,13 +142,13 @@ class MazeGenerator:
 
         def check_possible(x: int, y: int) -> list[int]:
             possible = []
-            if y > 0 and self.visited[y - 1][x] == False:
+            if y > 0 and not self.visited[y - 1][x]:
                 possible.append(0)
-            if x < self.width - 1 and self.visited[y][x + 1] == False:
+            if x < self.width - 1 and not self.visited[y][x + 1]:
                 possible.append(1)
-            if y < self.height - 1 and self.visited[y + 1][x] == False:
+            if y < self.height - 1 and not self.visited[y + 1][x]:
                 possible.append(2)
-            if x > 0 and self.visited[y][x - 1] == False:
+            if x > 0 and not self.visited[y][x - 1]:
                 possible.append(3)
             return possible
 
@@ -246,7 +256,9 @@ class MazeGenerator:
         path.reverse()
         return "".join(path)
 
-    def save_file(self, filename: str, end: tuple[int, int], road: str) -> None:
+    def save_file(
+        self, filename: str, end: tuple[int, int], road: str
+    ) -> None:
         with open(filename, "w") as f:
             for row in self.maze:
                 hex_row = "".join(f"{cell:X}" for cell in row)
@@ -259,10 +271,10 @@ class MazeGenerator:
     def display(
         self,
         wall_color: str = "",
-        path_coords: set = None,
-        end_pos: tuple[int, int] = None,
+        path_coords: set[tuple[int, int]] | None = None,
+        end_pos: tuple[int, int] | None = None,
     ) -> None:
-        """Классическая визуализация +---+, которая идеально работает в PowerShell."""
+        """Классическая визуализация +---+, которая идеально работает в PS."""
         if path_coords is None:
             path_coords = set()
         if end_pos is None:
@@ -287,7 +299,8 @@ class MazeGenerator:
                 elif (x, y) in path_coords:
                     mid_line += f"{west_wall}\033[44m   {reset}{wall_color}"
                 elif (x, y) == self.start:
-                    mid_line += f"{west_wall}\033[45m   {reset}{wall_color}"  # магента = вход
+                    # магента = вход
+                    mid_line += f"{west_wall}\033[45m   {reset}{wall_color}"
                 elif (x, y) == end_pos:
                     mid_line += f"{west_wall}\033[41m   {reset}{wall_color}"
                 else:
@@ -300,4 +313,3 @@ class MazeGenerator:
             bottom_line += "+---" if self.maze[-1][x] & 4 else "+   "
         print(f"{wall_color}{bottom_line}+{reset}")
         print("==================\n")
-
